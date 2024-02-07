@@ -10,7 +10,9 @@ const helmet = require("helmet");
 const Credential = require("./db/connect");
 
 // Secuirty
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false
+}));
 // Use url-encoded parser
 app.use(express.urlencoded({extended: true}));
 // Use json parser
