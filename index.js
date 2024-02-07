@@ -6,6 +6,8 @@ const express = require("express");
 const app = express();
 // helmet for secuirty (modifying headers).
 const helmet = require("helmet");
+// cors
+const cors = require("cors");
 // mongoDB collection model.
 const Credential = require("./db/connect");
 
@@ -13,6 +15,8 @@ const Credential = require("./db/connect");
 app.use(helmet({
   crossOriginResourcePolicy: false
 }));
+// set up cors
+app.use(cors());
 // Use url-encoded parser
 app.use(express.urlencoded({extended: true}));
 // Use json parser
