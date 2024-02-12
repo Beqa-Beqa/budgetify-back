@@ -9,7 +9,7 @@ const helmet = require("helmet");
 // cors
 const cors = require("cors");
 // mongoDB collection model.
-const Credential = require("./db/connect");
+const {Credential, Account} = require("./db/connect");
 
 // Secuirty
 app.use(helmet({
@@ -30,9 +30,14 @@ app.post("/login", async (req,res) => {
 
   try{
     // Try to fetch data based on email and user, (find user)
-    const response = await Credential.find({email: email, password: password});
+    const credentialResponse = await Credential.findOne({email: email, password: password});
+    // Fetch current user's accounts data.
+    const accountsResponse = await Account.find({owner: credentialResponse._id})
     // Send status code 200 and response json.
-    res.status(200).json({res: response})
+    res.status(200).json({
+      credentialRes: credentialResponse,
+      accountsData: accountsResponse
+    })
   }catch (err){
     // If error, send status code 500 and message with err.message
     res.status(500).json({
@@ -40,6 +45,29 @@ app.post("/login", async (req,res) => {
     });
   }
 });
+
+app.post("/create-account", async (req,res) => {
+  try {
+    // destructure request body.
+    const {userId, accountData} = req.body;
+    const {title, currency, description} = accountData;
+
+    // createa ccount.
+    const result = await Account.create({
+      owner: userId,
+      title,
+      currency,
+      description
+    });
+    // send back the created accaount info.
+    res.status(201).json(result);
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
+  }
+})
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
