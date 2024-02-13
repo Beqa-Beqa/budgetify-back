@@ -67,7 +67,31 @@ app.post("/create-account", async (req,res) => {
       message: err.message
     });
   }
-})
+});
+
+app.patch("/edit-account", async (req,res) => {
+  try {
+    const {accId, fields} = req.body.infoForEdit;
+    const result = await Account.findOneAndUpdate({_id: accId}, fields);
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    })
+  }
+});
+
+app.post("/delete-account", async (req,res) => {
+  try {
+    const {accId, userId} = req.body;
+    const result = await Account.deleteOne({owner: userId, _id: accId});
+    res.json(201).json({result});
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    })
+  }
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
