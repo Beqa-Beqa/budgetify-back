@@ -72,7 +72,7 @@ app.post("/create-account", async (req,res) => {
 app.patch("/edit-account", async (req,res) => {
   try {
     const {accId, fields} = req.body.infoForEdit;
-    const result = await Account.findOneAndUpdate({_id: accId}, fields);
+    const result = await Account.findOneAndUpdate({_id: accId}, fields, {returnDocument: "after"});
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json({
