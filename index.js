@@ -9,7 +9,7 @@ const helmet = require("helmet");
 // cors
 const cors = require("cors");
 // mongoDB collection model.
-const {Credential, Account} = require("./db/connect");
+const {Credential, Account, Transaction} = require("./db/connect");
 
 // Secuirty
 app.use(helmet({
@@ -32,11 +32,16 @@ app.post("/login", async (req,res) => {
     // Try to fetch data based on email and user, (find user)
     const credentialResponse = await Credential.findOne({email: email, password: password});
     // Fetch current user's accounts data.
-    const accountsResponse = await Account.find({owner: credentialResponse._id})
+    const accountsResponse = await Account.find({owner: credentialResponse._id});
+    // Retrieve ids of accounts.
+    const accountsIds = accountsResponse.map((accountData) => accountData._id);
+    // Fetch current user's transactions data.
+    const transanctionResponse = await Transaction.find({belongsToAccountWithId: {$in: accountsIds}});
     // Send status code 200 and response json.
     res.status(200).json({
       credentialRes: credentialResponse,
-      accountsData: accountsResponse
+      accountsData: accountsResponse,
+      transactionsData: transanctionResponse
     })
   }catch (err){
     // If error, send status code 500 and message with err.message
@@ -92,6 +97,29 @@ app.post("/delete-account", async (req,res) => {
     })
   }
 });
+
+app.post("/create-transaction", async (req,res) => {
+  try {
+    const {belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories} = req.body.transactionData;
+    const currentEnvTimeInUnix = new Date().getTime().toString();
+
+    const result = await Transaction.create({
+      belongsToAccountWithId,
+      transactionType,
+      title,
+      description,
+      amount,
+      date,
+      chosenCategories,
+      creationDate: currentEnvTimeInUnix,
+      updateDate: currentEnvTimeInUnix
+    });
+
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json({message: err.message});
+  }
+})
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

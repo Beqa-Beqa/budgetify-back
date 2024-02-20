@@ -4,6 +4,54 @@ const mongoose = require("mongoose");
 // Connect to mongoDb with it's connection string.
 mongoose.connect(process.env.MONGO_URI);
 
+// Acount transaction schema.
+const transactionSchema = new mongoose.Schema({
+  belongsToAccountWithId: {
+    type: String,
+    required: true
+  },
+
+  transactionType: {
+    type: String,
+    required: true
+  },
+
+  title: {
+    type: String,
+    required: true
+  },
+
+  description: {
+    type: String,
+    default: ""
+  },
+
+  amount: {
+    type: Number,
+    required: true
+  },
+
+  date: {
+    type: String,
+    required: true
+  },
+
+  chosenCategories: {
+    type: [String],
+    required: true
+  },
+
+  creationDate: {
+    type: String,
+    required: true
+  },
+
+  updateDate: {
+    type: String,
+    required: true
+  }
+});
+
 // User accounts schema.
 const accountsSchema = new mongoose.Schema({
   owner: {
@@ -63,8 +111,10 @@ const credentialsSchema = new mongoose.Schema({
 
 // Create credential model and name it "credentials" - (collection) based on crdential schema.
 const Credential = mongoose.model("credentials", credentialsSchema);
-// Create account model and name it "accounts" - (collection) based on crdential schema.
+// Create account model and name it "accounts" - (collection) based on accounts schema.
 const Account = mongoose.model("accounts", accountsSchema)
+// Create account model and name it "transactions" - (collection) based on transactions schema.
+const Transaction = mongoose.model("transactions", transactionSchema);
 
 // export Credential model with commonJS syntax.
-module.exports = {Credential, Account};
+module.exports = {Credential, Account, Transaction};
