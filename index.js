@@ -62,7 +62,7 @@ app.post("/create-account", async (req,res) => {
       owner: userId,
       title,
       currency,
-      amount: amount || 0,
+      amount: amount || "0",
       description
     });
     // send back the created accaount info.
