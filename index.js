@@ -55,13 +55,14 @@ app.post("/create-account", async (req,res) => {
   try {
     // destructure request body.
     const {userId, accountData} = req.body;
-    const {title, currency, description} = accountData;
+    const {title, currency, description, amount} = accountData;
 
     // createa ccount.
     const result = await Account.create({
       owner: userId,
       title,
       currency,
+      amount: amount || 0,
       description
     });
     // send back the created accaount info.
