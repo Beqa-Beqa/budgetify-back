@@ -90,8 +90,9 @@ app.patch("/edit-account", async (req,res) => {
 app.post("/delete-account", async (req,res) => {
   try {
     const {accId, userId} = req.body;
-    const result = await Account.deleteOne({owner: userId, _id: accId});
-    res.json(201).json({result});
+    const accountDeleteResult = await Account.deleteOne({owner: userId, _id: accId});
+    const transactionsDeleteResult = await Transaction.deleteMany({belongsToAccountWithId: accId});
+    res.json(201).json({accountDeleteResult, transactionsDeleteResult});
   } catch (err) {
     res.status(500).json({
       message: err.message
