@@ -120,7 +120,17 @@ app.post("/create-transaction", async (req,res) => {
   } catch (err) {
     res.status(500).json({message: err.message});
   }
-})
+});
+
+app.post("/edit-transaction", async (req,res) => {
+  try {
+    const {transactionId, belongsToId, fields} = req.body;
+    const result = await Transaction.findOneAndUpdate({_id: transactionId, belongsToAccountWithId: belongsToId}, fields, {returnDocument: "after"});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json({message: err.message});
+  }
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
