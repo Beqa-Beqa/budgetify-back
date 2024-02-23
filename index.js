@@ -122,7 +122,7 @@ app.post("/create-transaction", async (req,res) => {
   }
 });
 
-app.post("/edit-transaction", async (req,res) => {
+app.patch("/edit-transaction", async (req,res) => {
   try {
     const {transactionId, belongsToId, fields} = req.body;
     const result = await Transaction.findOneAndUpdate({_id: transactionId, belongsToAccountWithId: belongsToId}, fields, {returnDocument: "after"});
