@@ -136,8 +136,12 @@ app.patch("/edit-transaction", async (req,res) => {
 
 app.post("/delete-transaction", async (req,res) => {
   const {transactionId, belongsToId} = req.body;
-  const result = await Transaction.deleteOne({_id: transactionId, belongsToAccountWithId: belongsToId});
-  res.status(201).json(result);
+  try {
+    const result = await Transaction.deleteOne({_id: transactionId, belongsToAccountWithId: belongsToId});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
 })
 
 const port = process.env.PORT || 3000;
