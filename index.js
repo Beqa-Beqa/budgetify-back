@@ -102,7 +102,7 @@ app.post("/delete-account", async (req,res) => {
 
 app.post("/create-transaction", async (req,res) => {
   try {
-    const {belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories} = req.body.transactionData;
+    const {belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body.transactionData;
     const currentEnvTimeInUnix = new Date().getTime().toString();
 
     const result = await Transaction.create({
@@ -113,6 +113,7 @@ app.post("/create-transaction", async (req,res) => {
       amount,
       date,
       chosenCategories,
+      payee,
       creationDate: currentEnvTimeInUnix,
       updateDate: currentEnvTimeInUnix
     });

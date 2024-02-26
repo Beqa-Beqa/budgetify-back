@@ -36,6 +36,11 @@ const transactionSchema = new mongoose.Schema({
     required: true
   },
 
+  payee: {
+    type: String,
+    default: ""
+  },
+
   chosenCategories: {
     type: [String],
     required: true
