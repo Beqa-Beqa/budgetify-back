@@ -92,7 +92,7 @@ app.post("/delete-account", async (req,res) => {
     const {accId, userId} = req.body;
     const accountDeleteResult = await Account.deleteOne({owner: userId, _id: accId});
     const transactionsDeleteResult = await Transaction.deleteMany({belongsToAccountWithId: accId});
-    res.json(201).json({accountDeleteResult, transactionsDeleteResult});
+    res.status(201).json({accountDeleteResult, transactionsDeleteResult});
   } catch (err) {
     res.status(500).json({
       message: err.message
@@ -133,6 +133,12 @@ app.patch("/edit-transaction", async (req,res) => {
     res.status(500).json({message: err.message});
   }
 });
+
+app.post("/delete-transaction", async (req,res) => {
+  const {transactionId, belongsToId} = req.body;
+  const result = await Transaction.deleteOne({_id: transactionId, belongsToAccountWithId: belongsToId});
+  res.status(201).json(result);
+})
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
