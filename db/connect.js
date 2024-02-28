@@ -10,6 +10,10 @@ const categorySchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  transactionType: {
+    type: String,
+    required: true
+  },
   title: {
     type: String,
     required: true
