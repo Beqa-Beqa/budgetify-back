@@ -6,7 +6,7 @@ mongoose.connect(process.env.MONGO_URI);
 
 // category schema.
 const categorySchema = new mongoose.Schema({
-  owenr: {
+  owner: {
     type: String,
     required: true
   },
