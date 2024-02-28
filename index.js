@@ -9,7 +9,7 @@ const helmet = require("helmet");
 // cors
 const cors = require("cors");
 // mongoDB collection model.
-const {Credential, Account, Transaction} = require("./db/connect");
+const {Credential, Account, Transaction, Category} = require("./db/connect");
 
 // Secuirty
 app.use(helmet({
@@ -126,8 +126,9 @@ app.post("/create-transaction", async (req,res) => {
 
 app.patch("/edit-transaction", async (req,res) => {
   try {
+    const currentEnvTimeInUnix = new Date().getTime().toString();
     const {transactionId, belongsToId, fields} = req.body;
-    const result = await Transaction.findOneAndUpdate({_id: transactionId, belongsToAccountWithId: belongsToId}, fields, {returnDocument: "after"});
+    const result = await Transaction.findOneAndUpdate({_id: transactionId, belongsToAccountWithId: belongsToId}, {...fields, updateDate: currentEnvTimeInUnix}, {returnDocument: "after"});
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json({message: err.message});
@@ -142,7 +143,37 @@ app.post("/delete-transaction", async (req,res) => {
   } catch (err) {
     res.status(500).json(err.message);
   }
-})
+});
+
+app.post("/create-category", async (req,res) => {
+  const {owner, title} = req.body;
+  try {
+    const result = await Category.create({owner, title});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
+
+app.patch("/edit-category", async (req,res) => {
+  const {owner, categoryId, fields} = req.body.infoForEdit;
+  try {
+    const result = await Category.findOneAndUpdate({owner, _id: categoryId}, {fields}, {returnDocument: "after"});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
+
+app.post("/delete-category", async (req,res) => {
+  const {owner, categoryId} = req.body;
+  try {
+    const result = await Category.deleteOne({owner, _id: categoryId});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

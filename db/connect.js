@@ -4,6 +4,18 @@ const mongoose = require("mongoose");
 // Connect to mongoDb with it's connection string.
 mongoose.connect(process.env.MONGO_URI);
 
+// category schema.
+const categorySchema = new mongoose.Schema({
+  owenr: {
+    type: String,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  }
+});
+
 // Acount transaction schema.
 const transactionSchema = new mongoose.Schema({
   belongsToAccountWithId: {
@@ -117,8 +129,10 @@ const credentialsSchema = new mongoose.Schema({
 const Credential = mongoose.model("credentials", credentialsSchema);
 // Create account model and name it "accounts" - (collection) based on accounts schema.
 const Account = mongoose.model("accounts", accountsSchema)
-// Create account model and name it "transactions" - (collection) based on transactions schema.
+// Create transaction model and name it "transactions" - (collection) based on transactions schema.
 const Transaction = mongoose.model("transactions", transactionSchema);
+// Create category model and name it "categories" - (collection) based on category schema.
+const Category = mongoose.model("categories", categorySchema);
 
 // export Credential model with commonJS syntax.
-module.exports = {Credential, Account, Transaction};
+module.exports = {Credential, Account, Transaction, Category};
