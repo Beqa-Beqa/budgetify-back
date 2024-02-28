@@ -37,11 +37,14 @@ app.post("/login", async (req,res) => {
     const accountsIds = accountsResponse.map((accountData) => accountData._id);
     // Fetch current user's transactions data.
     const transanctionResponse = await Transaction.find({belongsToAccountWithId: {$in: accountsIds}});
+    // Fetch current user's categories data.
+    const categoriesResponse = await Category.find({owner: credentialResponse._id});
     // Send status code 200 and response json.
     res.status(200).json({
       credentialRes: credentialResponse,
       accountsData: accountsResponse,
-      transactionsData: transanctionResponse
+      transactionsData: transanctionResponse,
+      categoriesData: categoriesResponse
     })
   }catch (err){
     // If error, send status code 500 and message with err.message
