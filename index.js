@@ -149,7 +149,7 @@ app.post("/delete-transaction", async (req,res) => {
 });
 
 app.post("/create-category", async (req,res) => {
-  const {owner, title} = req.body;
+  const {owner, title, transactionType} = req.body;
   try {
     const result = await Category.create({owner, title});
     res.status(201).json(result);
