@@ -161,7 +161,7 @@ app.post("/create-category", async (req,res) => {
 app.patch("/edit-category", async (req,res) => {
   const {owner, categoryId, fields} = req.body.infoForEdit;
   try {
-    const result = await Category.findOneAndUpdate({owner, _id: categoryId}, {fields}, {returnDocument: "after"});
+    const result = await Category.findOneAndUpdate({owner, _id: categoryId}, fields, {returnDocument: "after"});
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json(err.message);
