@@ -70,6 +70,11 @@ const transactionSchema = new mongoose.Schema({
   updateDate: {
     type: String,
     required: true
+  },
+
+  files: {
+    type: [Buffer],
+    default: []
   }
 });
 
