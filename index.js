@@ -10,8 +10,8 @@ const helmet = require("helmet");
 const cors = require("cors");
 // mongoDB collection model.
 const {Credential, Account, Transaction, Category} = require("./db/connect");
-const filesArrayToBufferArray = require("./middlewares/filesArrayToBufferArray");
 const multer = require("multer");
+const upload = multer({storage: multer.memoryStorage()});
 
 // Secuirty
 app.use(helmet({
@@ -23,7 +23,6 @@ app.use(cors());
 app.use(express.urlencoded({extended: true}));
 // Use json parser
 app.use(express.json());
-app.use(multer);
 
 // login endpoint for login post requests.
 app.post("/login", async (req,res) => {
@@ -106,12 +105,17 @@ app.post("/delete-account", async (req,res) => {
   }
 });
 
-app.post("/create-transaction", filesArrayToBufferArray, async (req,res) => {
+app.post("/create-transaction", upload.array("file-input"), async (req,res) => {
   try {
     const {belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body.transactionData;
     const currentEnvTimeInUnix = new Date().getTime().toString();
-    
-    console.log("ReqBufArray ", req.filesInBuffer);
+    const filesArray = req.files;
+    const filesBuffer = [];
+
+    for(let file of filesArray) {
+      const buf = file.buffer;
+      filesBuffer.push(buf);
+    }
 
     const result = await Transaction.create({
       belongsToAccountWithId,
@@ -124,7 +128,7 @@ app.post("/create-transaction", filesArrayToBufferArray, async (req,res) => {
       payee,
       creationDate: currentEnvTimeInUnix,
       updateDate: currentEnvTimeInUnix,
-      files: req.filesInBuffer
+      files: filesBuffer
     });
 
     res.status(201).json(result);
