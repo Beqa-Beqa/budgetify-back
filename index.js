@@ -109,6 +109,8 @@ app.post("/create-transaction", filesArrayToBufferArray, async (req,res) => {
     const {belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body.transactionData;
     const currentEnvTimeInUnix = new Date().getTime().toString();
     
+    console.log("ReqBufArray ", req.filesInBuffer);
+
     const result = await Transaction.create({
       belongsToAccountWithId,
       transactionType,
