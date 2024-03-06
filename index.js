@@ -11,6 +11,7 @@ const cors = require("cors");
 // mongoDB collection model.
 const {Credential, Account, Transaction, Category} = require("./db/connect");
 const filesArrayToBufferArray = require("./middlewares/filesArrayToBufferArray");
+const multer = require("multer");
 
 // Secuirty
 app.use(helmet({
@@ -22,6 +23,7 @@ app.use(cors());
 app.use(express.urlencoded({extended: true}));
 // Use json parser
 app.use(express.json());
+app.use(multer);
 
 // login endpoint for login post requests.
 app.post("/login", async (req,res) => {
