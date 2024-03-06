@@ -10,6 +10,7 @@ const helmet = require("helmet");
 const cors = require("cors");
 // mongoDB collection model.
 const {Credential, Account, Transaction, Category} = require("./db/connect");
+const filesArrayToBufferArray = require("./middlewares/filesArrayToBufferArray");
 
 // Secuirty
 app.use(helmet({
@@ -103,11 +104,11 @@ app.post("/delete-account", async (req,res) => {
   }
 });
 
-app.post("/create-transaction", async (req,res) => {
+app.post("/create-transaction", filesArrayToBufferArray, async (req,res) => {
   try {
     const {belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body.transactionData;
     const currentEnvTimeInUnix = new Date().getTime().toString();
-
+    
     const result = await Transaction.create({
       belongsToAccountWithId,
       transactionType,
@@ -118,7 +119,8 @@ app.post("/create-transaction", async (req,res) => {
       chosenCategories,
       payee,
       creationDate: currentEnvTimeInUnix,
-      updateDate: currentEnvTimeInUnix
+      updateDate: currentEnvTimeInUnix,
+      files: req.filesInBuffer
     });
 
     res.status(201).json(result);
