@@ -20,8 +20,25 @@ const categorySchema = new mongoose.Schema({
   }
 });
 
+// transaction attachment file schema.
+const transactionFileSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  path: {
+    type: String,
+    required: true
+  }
+});
+
 // Acount transaction schema.
 const transactionSchema = new mongoose.Schema({
+  id: {
+    type: String,
+    required: true
+  },
+
   belongsToAccountWithId: {
     type: String,
     required: true
@@ -73,7 +90,7 @@ const transactionSchema = new mongoose.Schema({
   },
 
   files: {
-    type: [Buffer],
+    type: [transactionFileSchema],
     default: []
   }
 });

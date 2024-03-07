@@ -1,5 +1,7 @@
 // Initialize express app
 require("dotenv").config();
+const fs = require("fs");
+const path = require("path");
 // import express.
 const express = require("express");
 // initialize app as express app.
@@ -11,8 +13,22 @@ const cors = require("cors");
 // mongoDB collection model.
 const {Credential, Account, Transaction, Category} = require("./db/connect");
 const multer = require("multer");
-const upload = multer({storage: multer.memoryStorage()});
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    try {
+      fs.mkdirSync(`uploads/${req.body.id}`);
+    } catch (err) {
+      // pass
+    }
+    cb(null, `uploads/${req.body.id}`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+});
+const upload = multer({storage});
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Secuirty
 app.use(helmet({
   crossOriginResourcePolicy: false
@@ -23,6 +39,8 @@ app.use(cors());
 app.use(express.urlencoded({extended: true}));
 // Use json parser
 app.use(express.json());
+
+console.log(path.resolve(__dirname, "uploads"));
 
 // login endpoint for login post requests.
 app.post("/login", async (req,res) => {
@@ -105,19 +123,14 @@ app.post("/delete-account", async (req,res) => {
   }
 });
 
-app.post("/create-transaction", upload.array("file-input"), async (req,res) => {
+app.post("/create-transaction", upload.any(), async (req,res) => {
   try {
-    const {belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body.transactionData;
+    const {id, belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body;
     const currentEnvTimeInUnix = new Date().getTime().toString();
-    const filesArray = req.files;
-    const filesBuffer = [];
-
-    for(let file of filesArray) {
-      const buf = file.buffer;
-      filesBuffer.push(buf);
-    }
+    const filesPathArray = req.files.map((file) => {return {name: file.originalname, path: file.path}});
 
     const result = await Transaction.create({
+      id,
       belongsToAccountWithId,
       transactionType,
       title,
@@ -128,7 +141,7 @@ app.post("/create-transaction", upload.array("file-input"), async (req,res) => {
       payee,
       creationDate: currentEnvTimeInUnix,
       updateDate: currentEnvTimeInUnix,
-      files: filesBuffer
+      files: filesPathArray
     });
 
     res.status(201).json(result);
@@ -141,7 +154,7 @@ app.patch("/edit-transaction", async (req,res) => {
   try {
     const currentEnvTimeInUnix = new Date().getTime().toString();
     const {transactionId, belongsToId, fields} = req.body;
-    const result = await Transaction.findOneAndUpdate({_id: transactionId, belongsToAccountWithId: belongsToId}, {...fields, updateDate: currentEnvTimeInUnix}, {returnDocument: "after"});
+    const result = await Transaction.findOneAndUpdate({id: transactionId, belongsToAccountWithId: belongsToId}, {...fields, updateDate: currentEnvTimeInUnix}, {returnDocument: "after"});
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json({message: err.message});
@@ -151,7 +164,7 @@ app.patch("/edit-transaction", async (req,res) => {
 app.post("/delete-transaction", async (req,res) => {
   const {transactionId, belongsToId} = req.body;
   try {
-    const result = await Transaction.deleteOne({_id: transactionId, belongsToAccountWithId: belongsToId});
+    const result = await Transaction.deleteOne({id: transactionId, belongsToAccountWithId: belongsToId});
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json(err.message);
