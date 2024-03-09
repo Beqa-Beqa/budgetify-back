@@ -123,7 +123,7 @@ app.post("/create-transaction", upload.any(), async (req,res) => {
   try {
     const {id, belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body;
     const currentEnvTimeInUnix = new Date().getTime().toString();
-    const filesPathArray = req.files.map((file) => {return {name: file.originalname, path: file.path}});
+    const filesPathArray = req.files.map((file) => {return {name: file.originalname, path: file.path, size: file.size}});
 
     removeFilesFromUploadsIfNotIncluded(id, filesPathArray);
     removeEmptyFoldersFromUploads();

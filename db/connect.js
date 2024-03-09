@@ -29,6 +29,10 @@ const transactionFileSchema = new mongoose.Schema({
   path: {
     type: String,
     required: true
+  },
+  size: {
+    type: Number,
+    required: true
   }
 });
 
