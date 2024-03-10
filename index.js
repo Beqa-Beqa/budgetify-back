@@ -123,7 +123,7 @@ app.post("/create-transaction", upload.any(), async (req,res) => {
   try {
     const {id, belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body;
     const currentEnvTimeInUnix = new Date().getTime().toString();
-    const filesPathArray = req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
+    const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
 
     removeFilesFromUploadsIfNotIncluded(id, filesPathArray);
     removeEmptyFoldersFromUploads();
@@ -140,7 +140,7 @@ app.post("/create-transaction", upload.any(), async (req,res) => {
       payee,
       creationDate: currentEnvTimeInUnix,
       updateDate: currentEnvTimeInUnix,
-      files: filesPathArray
+      files: filesPathArray || []
     });
 
     res.status(201).json(result);
@@ -153,8 +153,8 @@ app.patch("/edit-transaction", upload.any(), async (req,res) => {
   try {
     const currentEnvTimeInUnix = new Date().getTime().toString();
     const {transactionId, belongsToId, fields} = req.body;
-    const filesPathArray = req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
-    fields.files = filesPathArray;
+    const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
+    if(filesPathArray) fields.files = filesPathArray;
 
     removeFilesFromUploadsIfNotIncluded(id, filesPathArray);
     removeEmptyFoldersFromUploads();
