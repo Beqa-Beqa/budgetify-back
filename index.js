@@ -13,10 +13,11 @@ const cors = require("cors");
 // mongoDB collection model.
 const {Credential, Account, Transaction, Category} = require("./db/connect");
 const multer = require("multer");
-const {removeFilesFromUploadsIfNotIncluded, removeFoldersFromUploadsIfEmpty, removeEmptyFoldersFromUploads} = require("./functions");
+const {removeFilesFromUploadsIfNotIncluded, removeEmptyFoldersFromUploads} = require("./functions");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    if(!fs.existsSync("uploads")) fs.mkdirSync("uploads");
     if(!fs.existsSync(`uploads/${req.body.id}`)) fs.mkdirSync(`uploads/${req.body.id}`);
     cb(null, `uploads/${req.body.id}`);
   },
