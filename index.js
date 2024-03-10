@@ -125,8 +125,8 @@ app.post("/create-transaction", upload.any(), async (req,res) => {
     const currentEnvTimeInUnix = new Date().getTime().toString();
     const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
 
-    removeFilesFromUploadsIfNotIncluded(id, filesPathArray);
-    removeEmptyFoldersFromUploads();
+    removeFilesFromUploadsIfNotIncluded(__dirname, id, filesPathArray);
+    removeEmptyFoldersFromUploads(__dirname);
 
     const result = await Transaction.create({
       id,
@@ -156,8 +156,8 @@ app.patch("/edit-transaction", upload.any(), async (req,res) => {
     const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
     if(filesPathArray) fields.files = filesPathArray;
 
-    removeFilesFromUploadsIfNotIncluded(id, filesPathArray);
-    removeEmptyFoldersFromUploads();
+    removeFilesFromUploadsIfNotIncluded(__dirname, id, filesPathArray);
+    removeEmptyFoldersFromUploads(__dirname);
 
     const result = await Transaction.findOneAndUpdate({id: transactionId, belongsToAccountWithId: belongsToId}, {...fields, updateDate: currentEnvTimeInUnix}, {returnDocument: "after"});
     res.status(201).json(result);
