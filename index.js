@@ -144,7 +144,7 @@ app.post("/create-transaction", async (req,res) => {
       payee,
       creationDate: currentEnvTimeInUnix,
       updateDate: currentEnvTimeInUnix,
-      files: filesPathArray || []
+      files: []
     });
 
     res.status(201).json(result);
