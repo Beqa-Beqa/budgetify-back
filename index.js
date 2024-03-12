@@ -12,20 +12,20 @@ const helmet = require("helmet");
 const cors = require("cors");
 // mongoDB collection model.
 const {Credential, Account, Transaction, Category} = require("./db/connect");
-const multer = require("multer");
-const {removeFilesFromUploadsIfNotIncluded, removeEmptyFoldersFromUploads} = require("./functions");
+// const multer = require("multer");
+// const {removeFilesFromUploadsIfNotIncluded, removeEmptyFoldersFromUploads} = require("./functions");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if(!fs.existsSync("uploads")) fs.mkdirSync("uploads");
-    if(!fs.existsSync(`uploads/${req.body.id}`)) fs.mkdirSync(`uploads/${req.body.id}`);
-    cb(null, `uploads/${req.body.id}`);
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  }
-});
-const upload = multer({storage});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     if(!fs.existsSync("uploads")) fs.mkdirSync("uploads");
+//     if(!fs.existsSync(`uploads/${req.body.id}`)) fs.mkdirSync(`uploads/${req.body.id}`);
+//     cb(null, `uploads/${req.body.id}`);
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, file.originalname);
+//   }
+// });
+// const upload = multer({storage});
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Secuirty
@@ -120,14 +120,16 @@ app.post("/delete-account", async (req,res) => {
   }
 });
 
-app.post("/create-transaction", upload.any(), async (req,res) => {
+// upload.any()
+
+app.post("/create-transaction", async (req,res) => {
   try {
     const {id, belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body;
     const currentEnvTimeInUnix = new Date().getTime().toString();
-    const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
+    // const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
 
-    removeFilesFromUploadsIfNotIncluded(__dirname, id, filesPathArray);
-    removeEmptyFoldersFromUploads(__dirname);
+    // removeFilesFromUploadsIfNotIncluded(__dirname, id, filesPathArray);
+    // removeEmptyFoldersFromUploads(__dirname);
 
     const result = await Transaction.create({
       id,
@@ -154,11 +156,11 @@ app.patch("/edit-transaction", upload.any(), async (req,res) => {
   try {
     const currentEnvTimeInUnix = new Date().getTime().toString();
     const {transactionId, belongsToId, fields} = req.body;
-    const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
-    if(filesPathArray) fields.files = filesPathArray;
+    // const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
+    // if(filesPathArray) fields.files = filesPathArray;
 
-    removeFilesFromUploadsIfNotIncluded(__dirname, id, filesPathArray);
-    removeEmptyFoldersFromUploads(__dirname);
+    // removeFilesFromUploadsIfNotIncluded(__dirname, id, filesPathArray);
+    // removeEmptyFoldersFromUploads(__dirname);
 
     const result = await Transaction.findOneAndUpdate({id: transactionId, belongsToAccountWithId: belongsToId}, {...fields, updateDate: currentEnvTimeInUnix}, {returnDocument: "after"});
     res.status(201).json(result);
@@ -171,8 +173,8 @@ app.post("/delete-transaction", async (req,res) => {
   const {transactionId, belongsToId} = req.body;
   try {
     const result = await Transaction.deleteOne({id: transactionId, belongsToAccountWithId: belongsToId});
-    fs.rmSync(`uploads/${transactionId}`, {recursive: true, force: true});
-    removeEmptyFoldersFromUploads();
+    // fs.rmSync(`uploads/${transactionId}`, {recursive: true, force: true});
+    // removeEmptyFoldersFromUploads();
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json(err.message);
