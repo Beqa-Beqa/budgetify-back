@@ -153,7 +153,9 @@ app.post("/create-transaction", async (req,res) => {
   }
 });
 
-app.patch("/edit-transaction", upload.any(), async (req,res) => {
+// upload.any()
+
+app.patch("/edit-transaction", async (req,res) => {
   try {
     const currentEnvTimeInUnix = new Date().getTime().toString();
     const {transactionId, belongsToId, fields} = req.body;
