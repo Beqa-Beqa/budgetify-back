@@ -27,7 +27,8 @@ const {Credential, Account, Transaction, Category} = require("./db/connect");
 // });
 // const upload = multer({storage});
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Secuirty
 app.use(helmet({
   crossOriginResourcePolicy: false
