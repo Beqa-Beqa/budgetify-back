@@ -11,7 +11,7 @@ const helmet = require("helmet");
 // cors
 const cors = require("cors");
 // mongoDB collection model.
-const {Credential, Account, Transaction, Category} = require("./db/connect");
+const {Credential, Account, Transaction, Category, Subscription} = require("./db/connect");
 // const multer = require("multer");
 // const {removeFilesFromUploadsIfNotIncluded, removeEmptyFoldersFromUploads} = require("./functions");
 
@@ -213,6 +213,44 @@ app.post("/delete-category", async (req,res) => {
     res.status(500).json(err.message);
   }
 });
+
+// title: string,
+// chosenCategories: string[],
+// amount: string,
+// dateRange: [Date | null, Date | null],
+// startDate: string,
+// endDate: string,
+// description?: string
+
+app.post("/create-subscription", async (req,res) => {
+  try {
+    const {belongsToAccountWithId, title, chosenCategories, amount, dateRange, startDate, endDate, description} = req.body;
+    const result = await Subscription.create({belongsToAccountWithId, title, chosenCategories, amount, dateRange, startDate, endDate, description});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+app.patch("/edit-subscription", async (req,res) => {
+  try {
+    const {subscriptionId, belongsToAccountWithId, fields} = req.body;
+    const result = await Subscription.findOneAndUpdate({_id: subscriptionId, belongsToAccountWithId}, fields, {returnDocument: "after"});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+app.post("/delete-subscription", async (req,res) => {
+  try {
+    const {subscriptionId, belongsToAccountWithId} = req.body;
+    const result = await Subscription.deleteOne({_id: subscriptionId, belongsToAccountWithId});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}); 
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

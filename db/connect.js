@@ -4,6 +4,52 @@ const mongoose = require("mongoose");
 // Connect to mongoDb with it's connection string.
 mongoose.connect(process.env.MONGO_URI);
 
+
+// _id: string,
+// title: string,
+// chosenCategories: string[],
+// amount: string,
+// dateRange: [Date | null, Date | null],
+// startDate: string,
+// endDate: string,
+// description?: string
+
+// subscription schema.
+const subscriptionSchema = new mongoose.Schema({
+  belongsToAccountWithId: {
+    type: String,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  chosenCategories: {
+    type: [String],
+    required: true
+  },
+  amount: {
+    type: String,
+    required: true
+  },
+  dateRange: {
+    type: [Date | null],
+    required: true
+  },
+  startDate: {
+    type: String,
+    required: true
+  },
+  endDate: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    default: ""
+  }
+});
+
 // category schema.
 const categorySchema = new mongoose.Schema({
   owner: {
@@ -167,6 +213,8 @@ const Account = mongoose.model("accounts", accountsSchema)
 const Transaction = mongoose.model("transactions", transactionSchema);
 // Create category model and name it "categories" - (collection) based on category schema.
 const Category = mongoose.model("categories", categorySchema);
+// Create subscription model and name it "subscriptions" - (collection) based on subscription schema.
+const Subscription = mongoose.model("subscriptions", subscriptionSchema);
 
 // export Credential model with commonJS syntax.
-module.exports = {Credential, Account, Transaction, Category};
+module.exports = {Credential, Account, Transaction, Category, Subscription};
