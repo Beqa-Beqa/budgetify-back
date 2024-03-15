@@ -16,6 +16,19 @@ mongoose.connect(process.env.MONGO_URI);
 
 // subscription schema.
 const subscriptionSchema = new mongoose.Schema({
+  creationDate: {
+    type: String,
+    required: true,
+    default: ""
+  },
+  year: {
+    type: Number,
+    required: true
+  },
+  months: {
+    type: [Number],
+    required: true
+  },
   belongsToAccountWithId: {
     type: String,
     required: true

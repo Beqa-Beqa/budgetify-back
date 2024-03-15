@@ -129,7 +129,7 @@ app.post("/delete-account", async (req,res) => {
 app.post("/create-transaction", async (req,res) => {
   try {
     const {id, belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body;
-    const currentEnvTimeInUnix = new Date().getTime().toString();
+    const currentEnvTimeInUnixString = new Date().getTime().toString();
     // const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
 
     // removeFilesFromUploadsIfNotIncluded(__dirname, id, filesPathArray);
@@ -145,8 +145,8 @@ app.post("/create-transaction", async (req,res) => {
       date,
       chosenCategories,
       payee,
-      creationDate: currentEnvTimeInUnix,
-      updateDate: currentEnvTimeInUnix,
+      creationDate: currentEnvTimeInUnixString,
+      updateDate: currentEnvTimeInUnixString,
       files: []
     });
 
@@ -228,7 +228,11 @@ app.post("/delete-category", async (req,res) => {
 app.post("/create-subscription", async (req,res) => {
   try {
     const {belongsToAccountWithId, title, chosenCategories, amount, dateRange, startDate, endDate, description} = req.body;
-    const result = await Subscription.create({belongsToAccountWithId, title, chosenCategories, amount, dateRange, startDate, endDate, description});
+    const currentEnvTime = new Date();
+    const currentEnvTimeInUnixString = currentEnvTime.getTime().toString();
+    const year = currentEnvTime.getFullYear();
+    const month = currentEnvTime.getMonth();
+    const result = await Subscription.create({creationDate: currentEnvTimeInUnixString, year, months: [month], belongsToAccountWithId, title, chosenCategories, amount, dateRange, startDate, endDate, description});
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json(err);
