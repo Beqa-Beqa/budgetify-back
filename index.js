@@ -232,7 +232,7 @@ app.post("/create-subscription", async (req,res) => {
     const currentEnvTimeInUnixString = currentEnvTime.getTime().toString();
     const year = currentEnvTime.getFullYear();
     const month = currentEnvTime.getMonth();
-    const result = await Subscription.create({creationDate: currentEnvTimeInUnixString, year, months: [month], belongsToAccountWithId, title, chosenCategories, amount, dateRange, startDate, endDate, description});
+    const result = await Subscription.create({creationDate: currentEnvTimeInUnixString, year, months: [], belongsToAccountWithId, title, chosenCategories, amount, dateRange, startDate, endDate, description});
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json(err);
