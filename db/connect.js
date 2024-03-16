@@ -4,15 +4,25 @@ const mongoose = require("mongoose");
 // Connect to mongoDb with it's connection string.
 mongoose.connect(process.env.MONGO_URI);
 
-
-// _id: string,
-// title: string,
-// chosenCategories: string[],
-// amount: string,
-// dateRange: [Date | null, Date | null],
-// startDate: string,
-// endDate: string,
-// description?: string
+// piggy bank chema.
+const piggyBankSchema = new mongoose.Schema({
+  belongsToAccountWithId: {
+    type: String,
+    required: true
+  },
+  goal: {
+    type: String,
+    required: true
+  },
+  goalAmount: {
+    type: String,
+    required: true,
+  },
+  currentAmount: {
+    type: String,
+    default: "0.00"
+  }
+});
 
 // subscription schema.
 const subscriptionSchema = new mongoose.Schema({
@@ -228,6 +238,8 @@ const Transaction = mongoose.model("transactions", transactionSchema);
 const Category = mongoose.model("categories", categorySchema);
 // Create subscription model and name it "subscriptions" - (collection) based on subscription schema.
 const Subscription = mongoose.model("subscriptions", subscriptionSchema);
+// Create piggy bank model and name it "piggybanks" - (collection) based on piggy bank schema.
+const PiggyBank = mongoose.model("piggybanks", piggyBankSchema);
 
 // export Credential model with commonJS syntax.
-module.exports = {Credential, Account, Transaction, Category, Subscription};
+module.exports = {Credential, Account, Transaction, Category, Subscription, PiggyBank};

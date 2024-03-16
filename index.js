@@ -11,7 +11,7 @@ const helmet = require("helmet");
 // cors
 const cors = require("cors");
 // mongoDB collection model.
-const {Credential, Account, Transaction, Category, Subscription} = require("./db/connect");
+const {Credential, Account, Transaction, Category, Subscription, PiggyBank} = require("./db/connect");
 // const multer = require("multer");
 // const {removeFilesFromUploadsIfNotIncluded, removeEmptyFoldersFromUploads} = require("./functions");
 
@@ -59,13 +59,16 @@ app.post("/login", async (req,res) => {
     const categoriesResponse = await Category.find({owner: credentialResponse._id});
     // Fetch current user's subscriptions data.
     const subscriptionsResponse = await Subscription.find({belongsToAccountWithId: {$in: accountsIds}});
+    // Fetch current user's piggy banks data.
+    const piggyBanksResponse = await PiggyBank.find({belongsToAccountWithId: {$in: accountsIds}});
     // Send status code 200 and response json.
     res.status(200).json({
       credentialRes: credentialResponse,
       accountsData: accountsResponse,
       transactionsData: transanctionResponse,
       categoriesData: categoriesResponse,
-      subscriptionsData: subscriptionsResponse
+      subscriptionsData: subscriptionsResponse,
+      piggyBanksData: piggyBanksResponse
     })
   }catch (err){
     // If error, send status code 500 and message with err.message
@@ -176,8 +179,8 @@ app.patch("/edit-transaction", async (req,res) => {
 });
 
 app.post("/delete-transaction", async (req,res) => {
-  const {transactionId, belongsToId} = req.body;
   try {
+    const {transactionId, belongsToId} = req.body;
     const result = await Transaction.deleteOne({id: transactionId, belongsToAccountWithId: belongsToId});
     // fs.rmSync(`uploads/${transactionId}`, {recursive: true, force: true});
     // removeEmptyFoldersFromUploads();
@@ -188,8 +191,8 @@ app.post("/delete-transaction", async (req,res) => {
 });
 
 app.post("/create-category", async (req,res) => {
-  const {owner, title, transactionType} = req.body;
   try {
+    const {owner, title, transactionType} = req.body;
     const result = await Category.create({owner, title, transactionType});
     res.status(201).json(result);
   } catch (err) {
@@ -198,8 +201,8 @@ app.post("/create-category", async (req,res) => {
 });
 
 app.patch("/edit-category", async (req,res) => {
-  const {owner, categoryId, fields} = req.body.infoForEdit;
   try {
+    const {owner, categoryId, fields} = req.body.infoForEdit;
     const result = await Category.findOneAndUpdate({owner, _id: categoryId}, fields, {returnDocument: "after"});
     res.status(201).json(result);
   } catch (err) {
@@ -208,8 +211,8 @@ app.patch("/edit-category", async (req,res) => {
 });
 
 app.post("/delete-category", async (req,res) => {
-  const {owner, categoryId} = req.body;
   try {
+    const {owner, categoryId} = req.body;
     const result = await Category.deleteOne({owner, _id: categoryId});
     res.status(201).json(result);
   } catch (err) {
@@ -217,21 +220,12 @@ app.post("/delete-category", async (req,res) => {
   }
 });
 
-// title: string,
-// chosenCategories: string[],
-// amount: string,
-// dateRange: [Date | null, Date | null],
-// startDate: string,
-// endDate: string,
-// description?: string
-
 app.post("/create-subscription", async (req,res) => {
   try {
     const {belongsToAccountWithId, title, chosenCategories, amount, dateRange, startDate, endDate, description} = req.body;
     const currentEnvTime = new Date();
     const currentEnvTimeInUnixString = currentEnvTime.getTime().toString();
     const year = currentEnvTime.getFullYear();
-    const month = currentEnvTime.getMonth();
     const result = await Subscription.create({creationDate: currentEnvTimeInUnixString, year, months: [], belongsToAccountWithId, title, chosenCategories, amount, dateRange, startDate, endDate, description});
     res.status(201).json(result);
   } catch (err) {
@@ -258,6 +252,36 @@ app.post("/delete-subscription", async (req,res) => {
     res.status(500).json(err);
   }
 }); 
+
+app.post("/create-piggy-bank", async (req,res) => {
+  try {
+    const {belongsToAccountWithId, goal, goalAmount} = req.body;
+    const result = await PiggyBank.create({belongsToAccountWithId, goal, goalAmount});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+app.patch("/edit-piggy-bank", async (req,res) => {
+  try {
+    const {belongsToAccountWithId, piggyBankId, fields} = req.body;
+    const result = await PiggyBank.findOneAndUpdate({_id: piggyBankId, belongsToAccountWithId}, fields, {returnDocument: "after"});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+app.post("/delete-piggy-bank", async (req,res) => {
+  try {
+    const {belongsToAccountWithId, piggyBankId} = req.body;
+    const result = await PiggyBank.deleteOne({_id: piggyBankId, belongsToAccountWithId});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
