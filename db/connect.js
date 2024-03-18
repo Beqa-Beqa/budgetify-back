@@ -4,6 +4,17 @@ const mongoose = require("mongoose");
 // Connect to mongoDb with it's connection string.
 mongoose.connect(process.env.MONGO_URI);
 
+const piggyBankPaymentSchema = new mongoose.Schema({
+  date: {
+    type: String,
+    required: true
+  },
+  amount: {
+    type: String,
+    required: true
+  }
+});
+
 // piggy bank chema.
 const piggyBankSchema = new mongoose.Schema({
   belongsToAccountWithId: {
@@ -21,6 +32,10 @@ const piggyBankSchema = new mongoose.Schema({
   currentAmount: {
     type: String,
     default: "0.00"
+  },
+  payments: {
+    type: [piggyBankPaymentSchema],
+    default: []
   }
 });
 
