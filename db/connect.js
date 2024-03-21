@@ -4,6 +4,41 @@ const mongoose = require("mongoose");
 // Connect to mongoDb with it's connection string.
 mongoose.connect(process.env.MONGO_URI);
 
+const obligatorySchema = new mongoose.Schema({
+  belongsToAccountWithId: {
+    type: String,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    default: ""
+  },
+  amount: {
+    type: String,
+    default: "0.00"
+  },
+  dateRange: {
+    type: [Date | null],
+    required: true
+  },
+  startDate: {
+    type: String,
+    required: true
+  },
+  endDate: {
+    type: String,
+    required: true
+  },
+  createdOn: {
+    type: String,
+    default: ""
+  }
+});
+
 const piggyBankPaymentSchema = new mongoose.Schema({
   date: {
     type: String,
@@ -106,11 +141,11 @@ const categorySchema = new mongoose.Schema({
 
 // transaction attachment file schema.
 const transactionFileSchema = new mongoose.Schema({
-  name: {
+  belongsToTransactionWithId: {
     type: String,
     required: true
   },
-  path: {
+  name: {
     type: String,
     required: true
   },
@@ -120,6 +155,10 @@ const transactionFileSchema = new mongoose.Schema({
   },
   size: {
     type: Number,
+    required: true
+  },
+  data: {
+    type: Buffer,
     required: true
   }
 });
@@ -255,6 +294,10 @@ const Category = mongoose.model("categories", categorySchema);
 const Subscription = mongoose.model("subscriptions", subscriptionSchema);
 // Create piggy bank model and name it "piggybanks" - (collection) based on piggy bank schema.
 const PiggyBank = mongoose.model("piggybanks", piggyBankSchema);
+// files model
+const File = mongoose.model("files", transactionFileSchema);
+// obligatory
+const Obligatory = mongoose.model("obligatories", obligatorySchema);
 
 // export Credential model with commonJS syntax.
-module.exports = {Credential, Account, Transaction, Category, Subscription, PiggyBank};
+module.exports = {Credential, Account, Transaction, Category, Subscription, PiggyBank, File, Obligatory};

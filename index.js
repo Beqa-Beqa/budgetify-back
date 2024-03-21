@@ -11,23 +11,9 @@ const helmet = require("helmet");
 // cors
 const cors = require("cors");
 // mongoDB collection model.
-const {Credential, Account, Transaction, Category, Subscription, PiggyBank} = require("./db/connect");
-// const multer = require("multer");
-// const {removeFilesFromUploadsIfNotIncluded, removeEmptyFoldersFromUploads} = require("./functions");
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     if(!fs.existsSync("uploads")) fs.mkdirSync("uploads");
-//     if(!fs.existsSync(`uploads/${req.body.id}`)) fs.mkdirSync(`uploads/${req.body.id}`);
-//     cb(null, `uploads/${req.body.id}`);
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, file.originalname);
-//   }
-// });
-// const upload = multer({storage});
-
-// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+const {Credential, Account, Transaction, Category, Subscription, PiggyBank, File, Obligatory} = require("./db/connect");
+const multer = require("multer");
+const upload = multer({storage: multer.memoryStorage()});
 
 // Secuirty
 app.use(helmet({
@@ -78,6 +64,8 @@ app.post("/login", async (req,res) => {
   }
 });
 
+// Accounts
+
 app.post("/create-account", async (req,res) => {
   try {
     // destructure request body.
@@ -127,16 +115,25 @@ app.post("/delete-account", async (req,res) => {
   }
 });
 
-// upload.any()
+// Transactions
 
-app.post("/create-transaction", async (req,res) => {
+app.post("/create-transaction", upload.any(), async (req,res) => {
   try {
     const {id, belongsToAccountWithId, transactionType, title, description, amount, date, chosenCategories, payee} = req.body;
     const currentEnvTimeInUnixString = new Date().getTime().toString();
-    // const filesPathArray = req.files && req.files.map((file) => {return {name: file.originalname, path: file.path, type: file.mimetype, size: file.size}});
-
-    // removeFilesFromUploadsIfNotIncluded(__dirname, id, filesPathArray);
-    // removeEmptyFoldersFromUploads(__dirname);
+    // const files = req.files;
+    // if(files) {
+    //   files.forEach(async (file) => {
+    //     const buffer = Buffer.from(file.buffer);
+    //     await File.create({
+    //       belongsToTransactionWithId: id,
+    //       name: file.originalname,
+    //       type: file.mimetype,
+    //       size: file.size,
+    //       data: buffer
+    //     });
+    //   });
+    // }
 
     const result = await Transaction.create({
       id,
@@ -159,9 +156,7 @@ app.post("/create-transaction", async (req,res) => {
   }
 });
 
-// upload.any()
-
-app.patch("/edit-transaction", async (req,res) => {
+app.patch("/edit-transaction", upload.any(), async (req,res) => {
   try {
     const currentEnvTimeInUnix = new Date().getTime().toString();
     const {transactionId, belongsToId, fields} = req.body;
@@ -189,6 +184,8 @@ app.post("/delete-transaction", async (req,res) => {
     res.status(500).json(err.message);
   }
 });
+
+// Categories
 
 app.post("/create-category", async (req,res) => {
   try {
@@ -219,6 +216,8 @@ app.post("/delete-category", async (req,res) => {
     res.status(500).json(err.message);
   }
 });
+
+// Subscriptions
 
 app.post("/create-subscription", async (req,res) => {
   try {
@@ -253,6 +252,8 @@ app.post("/delete-subscription", async (req,res) => {
   }
 }); 
 
+// Piggy banks
+
 app.post("/create-piggy-bank", async (req,res) => {
   try {
     const {belongsToAccountWithId, goal, goalAmount} = req.body;
@@ -277,6 +278,43 @@ app.post("/delete-piggy-bank", async (req,res) => {
   try {
     const {belongsToAccountWithId, piggyBankId} = req.body;
     const result = await PiggyBank.deleteOne({_id: piggyBankId, belongsToAccountWithId});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// Obligatories
+
+app.post("/create-obligatory", async (req,res) => {
+  try {
+    const createdOn = new Date().getTime().toString();
+    const {belongsToAccountWithId, title, description, amount, dateRange, startDate, endDate} = req.body;
+    const result = await Obligatory.create({
+      belongsToAccountWithId, title, description,
+      amount, dateRange, startDate, endDate, createdOn
+    });
+
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+app.post("/edit-obligatory", async (req,res) => {
+  try {
+    const {belongsToAccountWithId, obligatoryId, fields} = req.body;
+    const result = await Obligatory.findOneAndUpdate({_id: obligatoryId, belongsToAccountWithId}, fields, {returnDocument: "after"});
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+app.post("/delete-obligatory", async (req,res) => {
+  try {
+    const {belongsToAccountWithId, obligatoryId} = req.body;
+    const result = await Obligatory.findOneAndDelete({_id: obligatoryId, belongsToAccountWithId});
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json(err);
