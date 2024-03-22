@@ -47,6 +47,8 @@ app.post("/login", async (req,res) => {
     const subscriptionsResponse = await Subscription.find({belongsToAccountWithId: {$in: accountsIds}});
     // Fetch current user's piggy banks data.
     const piggyBanksResponse = await PiggyBank.find({belongsToAccountWithId: {$in: accountsIds}});
+    // Fetch current user's obligatories data.
+    const obligatoriesResponse = await Obligatory.find({belongsToAccountWithId: {$in: accountsIds}});
     // Send status code 200 and response json.
     res.status(200).json({
       credentialRes: credentialResponse,
@@ -54,7 +56,8 @@ app.post("/login", async (req,res) => {
       transactionsData: transanctionResponse,
       categoriesData: categoriesResponse,
       subscriptionsData: subscriptionsResponse,
-      piggyBanksData: piggyBanksResponse
+      piggyBanksData: piggyBanksResponse,
+      obligatoryData: obligatoriesResponse
     })
   }catch (err){
     // If error, send status code 500 and message with err.message
