@@ -304,7 +304,7 @@ app.post("/create-obligatory", async (req,res) => {
   }
 });
 
-app.post("/edit-obligatory", async (req,res) => {
+app.patch("/edit-obligatory", async (req,res) => {
   try {
     const {belongsToAccountWithId, obligatoryId, fields} = req.body;
     const result = await Obligatory.findOneAndUpdate({_id: obligatoryId, belongsToAccountWithId}, fields, {returnDocument: "after"});
