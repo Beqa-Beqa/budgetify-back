@@ -5,6 +5,14 @@ const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGO_URI);
 
 const obligatorySchema = new mongoose.Schema({
+  year: {
+    type: Number,
+    required: true
+  },
+  months: {
+    type: [Number],
+    required: true
+  },
   belongsToAccountWithId: {
     type: String,
     required: true

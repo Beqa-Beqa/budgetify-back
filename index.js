@@ -291,11 +291,13 @@ app.post("/delete-piggy-bank", async (req,res) => {
 
 app.post("/create-obligatory", async (req,res) => {
   try {
-    const createdOn = new Date().getTime().toString();
+    const currentEnvTime = new Date();
+    const currentEnvTimeInUnixString = currentEnvTime.getTime().toString();
+    const year = currentEnvTime.getFullYear();
     const {belongsToAccountWithId, title, description, amount, dateRange, startDate, endDate} = req.body;
     const result = await Obligatory.create({
-      belongsToAccountWithId, title, description,
-      amount, dateRange, startDate, endDate, createdOn
+      year, months: [], belongsToAccountWithId, title, description,
+      amount, dateRange, startDate, endDate, createdOn: currentEnvTimeInUnixString
     });
 
     res.status(201).json(result);
