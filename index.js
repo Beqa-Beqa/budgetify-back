@@ -75,13 +75,18 @@ app.post("/create-account", async (req,res) => {
     const {userId, accountData} = req.body;
     const {title, currency, description, amount} = accountData;
 
+    // get current time
+    const currentEnvTime = new Date();
+    const currentEnvTimeInUnixString = currentEnvTime.getTime().toString();
+
     // createa ccount.
     const result = await Account.create({
       owner: userId,
       title,
       currency,
       amount: amount || "0",
-      description
+      description,
+      creationDate: currentEnvTimeInUnixString
     });
     // send back the created accaount info.
     res.status(201).json(result);

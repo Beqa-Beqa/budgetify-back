@@ -236,26 +236,26 @@ const transactionSchema = new mongoose.Schema({
 
 // User accounts schema.
 const accountsSchema = new mongoose.Schema({
+  creationDate: {
+    type: String,
+    required: true
+  },
   owner: {
     type: String,
     required: true
   },
-
   title: {
     type: String,
     required: true,
   },
-
   currency: {
     type: String,
     required: true
   },
-
   amount: {
     type: String,
     required: true
   },
-
   description: {
     type: String
   }
